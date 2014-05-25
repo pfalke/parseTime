@@ -51,7 +51,7 @@ def checkStringForTime(timeString):
 	if relMatches:
 		print 'relative: ', relMatches.group()
 		return
-	dayMatches = re.match(dayRegex, timeString)
+	dayMatches = re.match(dayRegex, timeString, re.IGNORECASE)
 	if dayMatches:
 		# also matches '' and impossible times
 		print 'day: ', dayMatches.group()
