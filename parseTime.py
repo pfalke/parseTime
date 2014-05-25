@@ -36,7 +36,7 @@ tomorrow9am
 
 import re
 
-relativeRegex = r'^((\d+)(year|y|month|m|week|w|day|d|hour|h|minute|min)s?)+$'
+relativeRegex = r'^((?P<number>\d+)(?P<quantity>year|y|month|m|week|w|day|d|hour|h|minute|min)s?)+$'
 dayRegex = r'^(monday|mon|tuesday|tue|wednesday|wed|thursday|thu|friday|fri|saturday|sat|sunday|sun|tomorrow|)(\d{1,2}(?:am|pm|h)|)$'
 
 # return test from test@example.com, does not check if the string is a valid email address
