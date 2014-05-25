@@ -4,12 +4,12 @@ Convert a string to a python datetime.
 Below are sample inputs that should work once everyting is done.
 
 - absolute dates
+may10
+
+- absolute days and times
 wednesday
 wed
-may10
 tomorrow
-
-- absolute datetimes
 wednesday9am
 tomorrow9am
 9am
@@ -36,30 +36,44 @@ tomorrow9am
 
 import re
 
-relativeRegex = re.compile('(\d+)(year|y|month|m|week|w|day|d|hour|h|minute|min)s?')
+relativeRegex = r'^((\d+)(year|y|month|m|week|w|day|d|hour|h|minute|min)s?)+$'
+dayRegex = r'^(monday|mon|tuesday|tue|wednesday|wed|thursday|thu|friday|fri|saturday|sat|sunday|sun|tomorrow|)(\d{1,2}(?:am|pm|h)|)$'
 
-# return test from test@example.com
+# return test from test@example.com, does not check if the string is a valid email address
 def getEmailRecipient(emailAdress):
 	matchObj = re.match(r'(\w+)@', emailAdress)
 	if matchObj:
 		return matchObj.group(1)
 	return None
 
-def relativeTime(timeString):
-	matches = relativeRegex.findall(timeString)
-	print matches
+def checkStringForTime(timeString):
+	relMatches = re.match(relativeRegex,timeString, re.IGNORECASE)
+	if relMatches:
+		print 'relative: ', relMatches.group()
+		return
+	dayMatches = re.match(dayRegex, timeString)
+	if dayMatches:
+		# also matches '' and impossible times
+		print 'day: ', dayMatches.group()
+		return
+	print 'noMatch: ', timeString
 
 
 
 
-GoodStrings = ['11months23days', '4hours', '15year', '7h']
-BadStrings = ['months1', '7s', 'gibberish', '11slkfji']
+relativeStrings = ['11months23days', '4hours', '15year', '7h']
+dayStrings = ['monday', 'mon', 'mon9am', 'tomorrow9am', '9am', 'wed15h']
+badStrings = ['months1', '7s', 'gibberish', '11slkfji', '', '13am', 'tomorrow25h']
 
 
-print '\nTesting good strings'
-for s in GoodStrings:
-	relativeTime(s)
+print '\nTesting relative strings'
+for s in relativeStrings:
+	checkStringForTime(s)
+
+print '\nTesting day strings'
+for s in dayStrings:
+	checkStringForTime(s)
 
 print '\nTesting bad strings'
-for s in BadStrings:
-	relativeTime(s)
+for s in badStrings:
+	checkStringForTime(s)
