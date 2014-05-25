@@ -34,4 +34,32 @@ tomorrow9am
 
 """
 
+import re
 
+relativeRegex = re.compile('(\d+)(year|y|month|m|week|w|day|d|hour|h|minute|min)s?')
+
+# return test from test@example.com
+def getEmailRecipient(emailAdress):
+	matchObj = re.match(r'(\w+)@', emailAdress)
+	if matchObj:
+		return matchObj.group(1)
+	return None
+
+def relativeTime(timeString):
+	matches = relativeRegex.findall(timeString)
+	print matches
+
+
+
+
+GoodStrings = ['11months23days', '4hours', '15year', '7h']
+BadStrings = ['months1', '7s', 'gibberish', '11slkfji']
+
+
+print '\nTesting good strings'
+for s in GoodStrings:
+	relativeTime(s)
+
+print '\nTesting bad strings'
+for s in BadStrings:
+	relativeTime(s)
