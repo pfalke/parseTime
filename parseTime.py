@@ -46,14 +46,20 @@ relativeRegex = r'''
     '''
 dayRegex = r'''
     ^
-    (?P<day>monday|mon|tuesday|tue|wednesday|wed|thursday|thu|friday|fri|saturday|sat|sunday|sun|tomorrow|)     # either weekday or tomorrow, optional
+    (?P<day>monday|mon|tuesday|tue|wednesday|wed|thursday|thu|friday|fri|saturday|sat|sunday|sun|tomorrow|today)     # either weekday or tomorrow, optional
     (?P<time>\d{1,2}(?:am|pm|h)|)                                                                               # 9pm same as 21h, optional
+    $
+    '''
+dateRegex = r'''
+    ^
+    (?P<month>jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december)     # month
+    (?P<day>\d{1,2})                                                                               # day of the month
     $
     '''
 
 # return test from test@example.com, does not check if the string is a valid email address
 def getEmailRecipient(emailAdress):
-    matchObj = re.match(r'([a-z0-9\.]+)@', emailAdress)
+    matchObj = re.match(r'([^@]+)@', emailAdress)
     if matchObj:
         return matchObj.group(1)
     return None
@@ -68,6 +74,10 @@ def relativeTimeInString(timeString):
 def checkStringForTime(timeString):
     # convert to lowercase
     timeString = timeString.lower()
+    dateMatch = re.match(dateRegex, timeString, re.VERBOSE)
+    if dateMatch:
+        print 'date: %s %s' % dateMatch.group('month', 'day')
+        return
     relTime = relativeTimeInString(timeString)
     if relTime:
         print 'relative: ', relTime
@@ -75,16 +85,16 @@ def checkStringForTime(timeString):
     dayMatches = re.match(dayRegex, timeString, re.VERBOSE)
     if dayMatches:
         # also matches '' and impossible times
-        print 'day: ', dayMatches.group()
+        print 'day: %s %s' % dayMatches.group('day', 'time')
         return
     print 'noMatch: ', timeString
 
 
 
-
+dateStrings = ['march10', 'may31', 'feb28']
 relativeStrings = ['11months23days', '4hours', '15year', '7h', '11MONTHS', '12dAyS']
-dayStrings = ['monday', 'mon', 'mon9am', 'tomorrow9am', '9am', 'wed15h', 'THU', 'tOmOrrOw1am']
-badStrings = ['months1', '7s', 'gibberish', '11slkfji', '', '13am', 'tomorrow25h']
+dayStrings = ['monday', 'mon', 'mon9am', 'tomorrow9am', 'today9am', 'wed15h', 'THU', 'tOmOrrOw1am']
+badStrings = ['months1', '7s', 'gibberish', '11slkfji', '', '9am', '13am', 'tomorrow25h', 'march', '12', 'february30']
 
 
 print '\nTesting relative strings'
@@ -93,6 +103,10 @@ for s in relativeStrings:
 
 print '\nTesting day strings'
 for s in dayStrings:
+    checkStringForTime(s)
+
+print '\nTesting date strings'
+for s in dateStrings:
     checkStringForTime(s)
 
 print '\nTesting bad strings'
