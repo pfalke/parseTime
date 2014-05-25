@@ -53,7 +53,7 @@ dayRegex = r'''
 
 # return test from test@example.com, does not check if the string is a valid email address
 def getEmailRecipient(emailAdress):
-    matchObj = re.match(r'(\w+)@', emailAdress)
+    matchObj = re.match(r'([a-z0-9\.]+)@', emailAdress)
     if matchObj:
         return matchObj.group(1)
     return None
