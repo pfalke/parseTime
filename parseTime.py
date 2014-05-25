@@ -35,6 +35,8 @@ tomorrow9am
 """
 
 import re
+import datetime
+from dateutil.relativedelta import relativedelta
 
 relativeRegex = r'''
     ^
@@ -71,20 +73,50 @@ def relativeTimeInString(timeString):
         return [relMatches.group('number', 'type')] + relativeTimeInString(relMatches.group('remainingString'))
     return []
 
+def addRelativeTime(amount,timeType,startTime=None):
+    if not startTime:
+        startTime = datetime.datetime.now()
+    amount = int(amount)
+    if timeType in ('year','y'):
+        timeType = 'years'
+    if timeType in ('month','m'):
+        timeType = 'months'
+    if timeType in ('week', 'w'):
+        timeType = 'weeks'
+    if timeType in ('day', 'd'):
+        timeType = 'days'
+    if timeType in ('hour', 'h'):
+        timeType = 'hours'
+    if timeType in ('minute', 'min'):
+        timeType = 'mintues'
+    return startTime + relativedelta(**{timeType:amount})
+
+def relativeDateTimeFromTuples(timeTuples):
+    targetTime = datetime.datetime.now()
+    for amount, timeType in timeTuples:
+        targetTime = addRelativeTime(amount, timeType, targetTime)
+    return targetTime
+
+
+
 def checkStringForTime(timeString):
-    # convert to lowercase
+    # everything is case-insensitive
     timeString = timeString.lower()
+    # check for dates of type 'march30'
     dateMatch = re.match(dateRegex, timeString, re.VERBOSE)
     if dateMatch:
         print 'date: %s %s' % dateMatch.group('month', 'day')
         return
+    # check for relative time of type '1year2months'
     relTime = relativeTimeInString(timeString)
     if relTime:
         print 'relative: ', relTime
+        print 'time: ', relativeDateTimeFromTuples(relTime)
         return
+    # check for absolute dates/times of type 'tomorrow3am'
     dayMatches = re.match(dayRegex, timeString, re.VERBOSE)
     if dayMatches:
-        # also matches '' and impossible times
+        # warning: also matches '' and impossible times
         print 'day: %s %s' % dayMatches.group('day', 'time')
         return
     print 'noMatch: ', timeString
@@ -92,7 +124,7 @@ def checkStringForTime(timeString):
 
 
 dateStrings = ['march10', 'may31', 'feb28']
-relativeStrings = ['11months23days', '4hours', '15year', '7h', '11MONTHS', '12dAyS']
+relativeStrings = ['1months2days', '4hours', '15year', '7h', '11MONTHS', '12dAyS']
 dayStrings = ['monday', 'mon', 'mon9am', 'tomorrow9am', 'today9am', 'wed15h', 'THU', 'tOmOrrOw1am']
 badStrings = ['months1', '7s', 'gibberish', '11slkfji', '', '9am', '13am', 'tomorrow25h', 'march', '12', 'february30']
 
